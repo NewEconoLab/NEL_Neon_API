@@ -19,7 +19,7 @@ namespace NEL_Common
             return config;
         }
 
-        private static int appPort = 87;
+        private static int appPort;
         public static int getAppPort()
         {
             return appPort;
@@ -35,7 +35,7 @@ namespace NEL_Common
             int port = 0;
             try
             {
-                appPort = int.Parse(config["appPort"].ToString());
+                port = int.Parse(config["appPort"].ToString());
             }
             catch (Exception)
             {
