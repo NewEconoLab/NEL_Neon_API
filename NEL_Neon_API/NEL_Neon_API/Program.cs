@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using NEL_Common;
 
 namespace NEL_Neon_API
 {
@@ -23,7 +17,7 @@ namespace NEL_Neon_API
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {
-                    options.Listen(IPAddress.Any, 87);
+                    options.Listen(IPAddress.Any, Config.getAppPort());
                 })
                 .Build();
     }

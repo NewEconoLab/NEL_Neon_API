@@ -2,6 +2,8 @@
 using Newtonsoft.Json.Linq;
 using NEL_Neon_API.RPC;
 using NEL_Neon_API.Service;
+using NEL_Common;
+using NEL.helper;
 
 namespace NEL_Neon_API.Controllers
 {
@@ -21,9 +23,11 @@ namespace NEL_Neon_API.Controllers
             switch (netnode)
             {
                 case "testnet":
-                    compileService = new CompileService();
-                    break;
-                case "mainnet":
+                    compileService = new CompileService
+                    {
+                        debugger = CompileDebugger.getInstance(),
+                        ossClient = new OssFileService(Config.param.OssAPIUrl),
+                    };
                     break;
             }
         }
@@ -36,6 +40,9 @@ namespace NEL_Neon_API.Controllers
                 switch (req.method)
                 {
                     case "compileContractFile":
+                        result = compileService.compileFileAndOss(req.@params[0].ToString());
+                        break;
+                    case "compileContractFileOnly":
                         result = compileService.compileFile(req.@params[0].ToString());
                         break;
 
@@ -50,10 +57,10 @@ namespace NEL_Neon_API.Controllers
                     return resE;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("errMsg:{0},errStack:{1}", e.Message, e.StackTrace);
-                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(req.id, -100, "Parameter Error", e.Message);
+                LogHelper.printEx(ex);
+                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(req.id, -100, "Parameter Error", ex.Message);
                 return resE;
             }
 

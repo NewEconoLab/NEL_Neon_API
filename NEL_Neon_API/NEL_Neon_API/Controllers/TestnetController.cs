@@ -5,19 +5,17 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using log4net;
 using NEL_Neon_API.RPC;
-using NEL_Neon_API.lib;
-using NEL_Neon_API;
+using NEL.helper;
 
 namespace NEL_Neon_API.Controllers
 {
     [Route("api/[controller]")]
     public class TestnetController : Controller
     {
-        //Api api = new Api("testnet");
         Api api = Api.getTestApi();
 
         private long logExeTimeMax = 15; // 运行最大请求耗时15秒
-        private ILog log = LogManager.GetLogger(Startup.repository.Name, typeof(TestnetController));
+        private ILog log = LogHelper.getLogger(typeof(TestnetController));
 
         [HttpGet]
         public JsonResult Get(string @jsonrpc, string @method, string @params, long @id)
@@ -41,51 +39,23 @@ namespace NEL_Neon_API.Controllers
                 // 超时记录
                 if (DateTime.Now.Subtract(start).TotalSeconds > logExeTimeMax)
                 {
-                    log.Info(logHelper.logInfoFormat(req, res, start));
+                    log.Info(LogHelper.logInfoFormat(req, res, start));
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("errMsg:{0},errStack:{1}", e.Message, e.StackTrace);
-                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(0, -100, "Parameter Error", e.Message);
+                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(0, -100, "Parameter Error", ex.Message);
                 res = Json(resE);
 
                 // 错误记录
-                log.Info(logHelper.logInfoFormat(req, res, start));
+                log.Info(LogHelper.logInfoFormat(req, res, start));
+                LogHelper.printEx(ex);
             }
 
 
             return res;
         }
-
-        public void test()
-        {
-            Console.WriteLine("*********************************************print.request.st");
-            var r1 = HttpContext.Request.ContentType;
-            Console.WriteLine("contentType:"+r1);
-            var r2 = HttpContext.Request.ContentLength;
-            Console.WriteLine("contentLength:"+r2);
-            var r3 = HttpContext.Request.Host;
-            Console.WriteLine("Host:"+r3);
-            var r4 = HttpContext.Request.IsHttps;
-            Console.WriteLine("IsHttps:"+r4);
-
-            Console.WriteLine("Method:"+ HttpContext.Request.Method);
-            Console.WriteLine("Path:"+ HttpContext.Request.Path);
-            Console.WriteLine("PathBase:"+ HttpContext.Request.PathBase);
-            Console.WriteLine("Protocol:"+ HttpContext.Request.Protocol);
-
-            var r5 = HttpContext.Request.Headers;
-            Console.WriteLine("Headers:");
-            foreach(var s in r5)
-            {
-                Console.WriteLine("\t"+s.Key + " ---> " + s.Value);
-            }
-
-            var r6 = HttpContext.Request.Body;
-            Console.WriteLine("body:"+r6);
-            Console.WriteLine("*********************************************print.request.ed");
-        }
+        
         [HttpPost]
         public async Task<JsonResult> Post()
         {
@@ -125,17 +95,17 @@ namespace NEL_Neon_API.Controllers
                 // 超时记录
                 if (DateTime.Now.Subtract(start).TotalSeconds > logExeTimeMax)
                 {
-                    log.Info(logHelper.logInfoFormat(req, res, start));
+                    log.Info(LogHelper.logInfoFormat(req, res, start));
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("errMsg:{0},errStack:{1}", e.Message, e.StackTrace);
-                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(0, -100, "Parameter Error", e.Message);
+                JsonPRCresponse_Error resE = new JsonPRCresponse_Error(0, -100, "Parameter Error", ex.Message);
                 res = Json(resE);
 
                 // 错误记录
-                log.Info(logHelper.logInfoFormat(req, res, start));
+                log.Info(LogHelper.logInfoFormat(req, res, start));
+                LogHelper.printEx(ex);
             }
 
             return res;
