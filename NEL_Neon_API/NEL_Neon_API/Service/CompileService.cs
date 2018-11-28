@@ -62,9 +62,9 @@ namespace NEL_Neon_API.Service
                 errMsg = ex.Message;
             }
             
-            return new JArray(){ new JObject() { { "code", code}, { "message", errMsg}, { "data", new JArray{ new JObject() {
+            return new JArray(){ new JObject() { { "code", code}, { "message", errMsg}, { "data", new JObject() {
                 {"hash", hash }
-            } } } } };
+            } } } };
         }
         private void saveCompileRes(string filetext, string avmtext, string abitext, string maptext, string hash)
         {
