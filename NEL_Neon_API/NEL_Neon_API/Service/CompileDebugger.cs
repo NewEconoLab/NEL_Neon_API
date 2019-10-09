@@ -7,7 +7,7 @@ namespace NEL_Neon_API.Service
 {
     public class CompileDebugger
     {
-        private PortableExecutableReference ref1, ref2, ref3, ref4;
+        private PortableExecutableReference ref1, ref2, ref3, ref4, ref5, ref6;
         private CSharpCompilationOptions op;
 
         public static CompileDebugger getInstance() {
@@ -16,24 +16,22 @@ namespace NEL_Neon_API.Service
         private static CompileDebugger debugger = new CompileDebugger();
         private CompileDebugger()
         {
-            ref1 = MetadataReference.CreateFromFile("needlib" + Path.DirectorySeparatorChar + "mscorlib.dll");
-            ref2 = MetadataReference.CreateFromFile("needlib" + Path.DirectorySeparatorChar + "System.dll");
-            ref3 = MetadataReference.CreateFromFile("needlib" + Path.DirectorySeparatorChar + "System.Numerics.dll");
-            ref4 = MetadataReference.CreateFromFile("needlib" + Path.DirectorySeparatorChar + "Neo.SmartContract.Framework.dll");
-            op = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            var coreDir = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
-            var buildpath = Path.GetFullPath("needlib");
-            if (!string.IsNullOrEmpty(buildpath))
-            {
-                Directory.SetCurrentDirectory(buildpath);
-                //mono.cecil need load dll from here.
-            }
+            ref1 = MetadataReference.CreateFromFile(Path.Combine(coreDir, "mscorlib.dll"));
+            ref2 = MetadataReference.CreateFromFile(Path.Combine(coreDir, "System.Runtime.dll"));
+            ref3 = MetadataReference.CreateFromFile(Path.Combine(coreDir, "System.Runtime.Numerics.dll"));
+            ref4 = MetadataReference.CreateFromFile(typeof(System.ComponentModel.DisplayNameAttribute).Assembly.Location);
+            ref5 = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+            //用netcore 可以直接引用neo.smartcontract.framework,保证都是一套的
+            ref6 = MetadataReference.CreateFromFile(typeof(Neo.SmartContract.Framework.OpCodeAttribute).Assembly.Location);
+            op = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
         }
         public bool compile(string filename, string filetext, out byte[] avmtext, out string abitext, out string maptext, out string hash)
         {
             var tree = CSharpSyntaxTree.ParseText(filetext);
             var comp = CSharpCompilation.Create("aaa.dll", new[] { tree },
-               new[] { ref1, ref2, ref3, ref4 }, op);
+               new PortableExecutableReference[] { ref1, ref2, ref3, ref4 ,ref5 , ref6}, op);
             
             var fs = new MemoryStream();
             var fspdb = new MemoryStream();
